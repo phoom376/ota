@@ -1,0 +1,49 @@
+.header {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+  display: flex;
+  p {
+    font-size: 30px;
+    margin-right: 10px;
+  }
+  .button {
+    cursor: pointer;
+    font-size: 60px;
+    // color: green;
+    transition: ease-in-out 0.3s;
+  }
+  .button:hover {
+    color: black;
+  }
+}
+
+.body {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  .box-form {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    form {
+      border-radius: 10px;
+
+      padding: 20px;
+
+      border: 1px solid black;
+
+      width: 600px;
+    }
+  }
+  .box-table {
+    width: 100%;
+
+    text-align: center;
+
+    margin-top: 10px;
+  }
+}

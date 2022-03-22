@@ -1,0 +1,70 @@
+html,
+body {
+  margin: 0;
+}
+
+.header {
+  text-align: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 20px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.header p {
+  font-size: 30px;
+  margin-right: 10px;
+}
+
+.header .button {
+  cursor: pointer;
+  font-size: 60px;
+  -webkit-transition: ease-in-out 0.3s;
+  transition: ease-in-out 0.3s;
+}
+
+.header .button:hover {
+  color: black;
+}
+
+.body {
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.body .box-form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  width: 100%;
+}
+
+.body .box-form form {
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid black;
+  width: 600px;
+}
+
+.body .box-table {
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+/*# sourceMappingURL=global.css.map */
