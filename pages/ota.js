@@ -268,7 +268,7 @@ class OTA extends Component {
                       let DateTime_tmp = i.time.split("T");
                       let time_tmp = DateTime_tmp[1].split(".");
                       return (
-                        <tr>
+                        <tr key={i.id}>
                           <td>{k + 1}</td>
                           <td>{i.id}</td>
                           <td>{i.version}</td>
