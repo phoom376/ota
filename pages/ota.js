@@ -31,8 +31,8 @@ class OTA extends Component {
     axios.get(`${this.state.server}/v1/getFileData`).then((res) => {
       this.setState({ data: res.data, size: 0 });
       if (res.data.length > 0) {
-        res.data.map((i) => {
-          this.setState({ size: (this.state.size += i.size) });
+        res.data.forEach((i) => {
+          // this.setState({ size: (this.state.size += i.size) });
         });
       }
       if (res.data.message) {

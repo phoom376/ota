@@ -19,7 +19,11 @@ export default function Selects({ version, versions, handleChange }) {
           onChange={handleChange}
         >
           {versions.map((v) => {
-            return <MenuItem value={v}>{v}</MenuItem>;
+            return (
+              <MenuItem key={v.id} value={v}>
+                {v}
+              </MenuItem>
+            );
           })}
         </Select>
       </FormControl>
