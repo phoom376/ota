@@ -6,11 +6,13 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import Dialogs from "@/components/layouts/Dialog";
 import Process from "@/components/layouts/reusable/Progress";
 import Selects from "@/components/Selects";
+import { fetchBoards, FETCH_BOARDS } from "../redux/actions/boards.redux";
+import { connect } from "react-redux";
 
 class Boards extends Component {
   state = {
-    // server: "http://localhost:4007/v1",
-    server: "http://matchchemical.ddns.net:4008/v1",
+    server: "http://localhost:4008/v1",
+    // server: "http://matchchemical.ddns.net:4008/v1",
     // server: "http://home420.trueddns.com:57527/v1",
     versionList: [],
     data: [],
@@ -20,10 +22,8 @@ class Boards extends Component {
     toggle: false,
   };
 
-  getData() {
-    axios.get(`${this.state.server}/getBoards`).then((res) => {
-      this.setState({ data: res.data });
-    });
+  async getData() {
+    await this.props.fetchBoards();
   }
 
   getVersionData() {
@@ -33,14 +33,22 @@ class Boards extends Component {
       });
     });
   }
-  componentDidMount() {
+
+  UNSAFE_componentWillMount() {
     this.getData();
+  }
+  componentDidMount() {
+    setInterval(() => {
+      this.getData();
+    }, 5000);
+
     this.getVersionData();
     console.log(this.state.versionList.length);
   }
 
   handleChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
+    console.log(this.props.data);
   };
 
   handleSubmit = (e) => {
@@ -54,7 +62,7 @@ class Boards extends Component {
           if (res.data.message) {
             alert(res.data.message);
           }
-          this.getData();
+          this.props.fetchBoards();
           this.handleToggle();
         });
     } else {
@@ -68,7 +76,7 @@ class Boards extends Component {
           if (res.data.message) {
             alert(res.data.message);
           }
-          this.getData();
+          this.fetchBoards();
           this.handleToggle();
         });
     }
@@ -204,56 +212,49 @@ class Boards extends Component {
                     <th>ID</th>
                     <th>NAME</th>
                     <th>TIME</th>
-                    <th>SENSOR</th>
-                    <th>DATA</th>
+                    <th>ONLINE</th>
                     <th>VERSION</th>
+                    <th>CURRENT_VERSION</th>
                     <th>EDIT</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {this.state.data.map((board, row) => {
-                    let tmpData = "";
-                    let sensorTmp = "";
-                    let valueTemp = "";
-                    let value = "";
-
-                    if (board.data != "" && board.data != null) {
-                      tmpData = board.data.split("|");
-                      sensorTmp = tmpData[0].split("-");
-                      valueTemp = tmpData[1].split(":");
-                      valueTemp.map((i) => {
-                        value += `${i} \n`;
-                      });
-                    }
-
-                    return (
-                      <tr key={board.b_id}>
-                        <td>{row + 1}</td>
-                        <td>{board.b_id}</td>
-                        <td>{board.name}</td>
-                        <td>{board.time}</td>
-                        <td>{sensorTmp != "" && sensorTmp[1]}</td>
-                        <td>{value}</td>
-                        <td>{board.version}</td>
-                        <td>
-                          <button
-                            className="btn btn-outline-warning"
-                            onClick={() => {
-                              this.handleToggle(
-                                board.b_id,
-                                board.name,
-                                board.version,
-                                true,
-                                board.id
-                              );
-                            }}
-                          >
-                            EDIT
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {this.props.data.boards.length > 0 &&
+                    this.props.data.boards.map((board, row) => {
+                      return (
+                        <tr key={board.device_id}>
+                          <td>{row + 1}</td>
+                          <td>{board.device_id}</td>
+                          <td>{board.name}</td>
+                          <td>{board.time}</td>
+                          <td>
+                            {board.online ? (
+                              <span style={{ color: "green" }}>ONLINE</span>
+                            ) : (
+                              <span style={{ color: "red" }}>OFFLINE</span>
+                            )}
+                          </td>
+                          <td>{board.version}</td>
+                          <td>{board.current}</td>
+                          <td>
+                            <button
+                              className="btn btn-outline-warning"
+                              onClick={() => {
+                                this.handleToggle(
+                                  board.b_id,
+                                  board.name,
+                                  board.version,
+                                  true,
+                                  board.id
+                                );
+                              }}
+                            >
+                              EDIT
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>
@@ -264,4 +265,16 @@ class Boards extends Component {
   }
 }
 
-export default Boards;
+// mapStateToProps
+// รับฟังก์ชันจาก store มาใช้งาน
+const mapStateToProps = (state) => {
+  return { data: state.boards };
+};
+
+// mapDispatchToProps
+// ส่งค่าไปยัง store เป็น object
+const mapDispatchToProps = {
+  fetchBoards: fetchBoards,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Boards);

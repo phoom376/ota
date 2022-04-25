@@ -1,6 +1,8 @@
 import { Component } from "react";
 import Default from "@/components/layouts/Default";
 import axios from "axios";
+import { fetchFilesData } from "redux/actions/file.actions";
+import { connect } from "react-redux";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveIcon from "@mui/icons-material/Remove";
 import Icon from "@mui/material/Icon";
@@ -10,9 +12,9 @@ import Process from "@/components/layouts/reusable/Progress";
 class OTA extends Component {
   state = {
     // server: "https://ota-drive.herokuapp.com",
-    // server: "http://localhost:4007",
+    server: "http://localhost:4008",
     // server: "http://home420.trueddns.com:57527",
-    server: "http://matchchemical.ddns.net:4008",
+    // server: "http://matchchemical.ddns.net:4008",
     name: "TEST State",
     version: "",
     fileName: "",
@@ -27,24 +29,33 @@ class OTA extends Component {
     size: 0,
   };
 
-  getData() {
-    axios.get(`${this.state.server}/v1/getFileData`).then((res) => {
-      this.setState({ data: res.data, size: 0 });
-      if (res.data.length > 0) {
-        res.data.forEach((i) => {
-          // this.setState({ size: (this.state.size += i.size) });
-        });
-      }
-      if (res.data.message) {
-        alert(res.data.message);
-      }
+  async getData() {
+    await this.props.fetchFilesData();
+    // await this.setSize();
+  }
 
-      console.log(this.state.data);
-    });
+  UNSAFE_componentWillMount() {
+    this.getData();
+    //
   }
 
   componentDidMount() {
-    this.getData();
+    // this.getData();
+    setInterval(() => {
+      this.getData();
+    }, 5000);
+  }
+
+  async setSize() {
+    let tmpSize = 0;
+    console.log(this.props.data.files.message);
+    if (!this.props.data.files.message) {
+      await this.props.data.files.map((i) => {
+        tmpSize += i.size;
+      });
+    }
+    await this.setState({ size: tmpSize });
+    console.log(tmpSize);
   }
 
   handleToggle = () => {
@@ -99,21 +110,23 @@ class OTA extends Component {
           },
         })
         .then((res) => {
-          if (res.data.status) {
-            setTimeout(() => {
-              alert(res.data.message);
-              this.setState({ version: "" });
-              this.setState({ description: "" });
-              document.getElementById("Form").reset();
-              this.setState({ progress: 0 });
-              this.getData();
-              this.handleToggle();
-            }, 1000);
-          } else {
+          // if (res.data.status) {
+          setTimeout(() => {
             alert(res.data.message);
+            this.setState({ version: "" });
+            this.setState({ description: "" });
+            document.getElementById("Form").reset();
+            this.setState({ progress: 0 });
+            this.setState({ size: 0 });
             this.getData();
-            this.setState({ process: 0 });
-          }
+
+            this.handleToggle();
+          }, 1000);
+          // } else {
+          //   alert(res.data.message);
+          //   this.setState({ size: 0, process: 0 });
+          //   this.getData();
+          // }
         });
     } else {
       console.log("NO");
@@ -137,6 +150,7 @@ class OTA extends Component {
       .delete(`${this.state.server}/v1/deleteFile/${id}`)
       .then((res) => {
         if (res.data.message) {
+          this.setState({ size: 0 });
           this.getData();
 
           alert("FILE DELETED");
@@ -263,8 +277,8 @@ class OTA extends Component {
                   </tr>
                 </thead>
                 <tbody>
-                  {this.state.data.length > 0 &&
-                    this.state.data.map((i, k) => {
+                  {this.props.data.files.length > 0 &&
+                    this.props.data.files.map((i, k) => {
                       let DateTime_tmp = i.time.split("T");
                       let time_tmp = DateTime_tmp[1].split(".");
                       return (
@@ -300,4 +314,12 @@ class OTA extends Component {
   }
 }
 
-export default OTA;
+const mapStateToProps = (state) => {
+  return { data: state.files };
+};
+
+const mapDispatchToProps = {
+  fetchFilesData: fetchFilesData,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OTA);
